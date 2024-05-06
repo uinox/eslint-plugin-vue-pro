@@ -1,0 +1,13 @@
+{
+  "name": "eslint-plugin-vue-pro",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "peerDependencies": {
+    "eslint": "^8.57.0",
+    "vue-eslint-parser": "^9.4.2"
+  }
+}
