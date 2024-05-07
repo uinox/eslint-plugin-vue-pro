@@ -21,7 +21,15 @@ module.exports = {
                     caseType: {
                         type: "string",
                         enum: allowedCaseOptions
-                    }
+                    },
+                    ignores: {
+                        type: "array",
+                        items: {
+                            type: "string"
+                        },
+                        uniqueItems: true,
+                        additionalItems: false
+                    },
                 },
                 additionalProperties: false
             }
@@ -34,16 +42,28 @@ module.exports = {
                 "VAttribute[directive=false][key.name='class']"(node){
                     const value = node.value;
                     if(!value) return;
-                    const { caseType } = context.options[0];
+                    const { caseType, ignores } = context.options[0];
                     const classList = value.value.split(" ");
                     classList.forEach(item=>{
+
+                        let isIgnore = false;
+                        
+                        if(ignores && ignores.length > 0){
+                            ignores.forEach(ignore=>{
+                                if(item.includes(ignore)){
+                                    isIgnore = true;
+                                }
+                            })
+                        }
+
                         const caseChecker = casing.getChecker(caseType || 'camelCase');
-                        if(caseType && !caseChecker(item)){
+                        if(!isIgnore && caseType && !caseChecker(item)){
                             context.report({
                                 node,
                                 message: `Vue css class names '${item}' does not match patterns, you should name them such as ${caseType === 'kebab-case' ? 'box-header' : 'boxHeader'}.`
                             })
                         }
+                        
                     })
                 }
             }    

@@ -45,6 +45,7 @@ Then configure the rules you want to use under the rules section.
             "error",
             {
                 "caseType": "kebab-case", // ['camelCase', 'kebab-case']
+                "ignores": ["el-"], //
             }
         ],
         "vue-pro/constant-naming": [
