@@ -1,6 +1,6 @@
 const casing = require("../utils/casing");
 const utils = require("../utils/index");
-const allowedCaseOptions = ['camelCase', 'kebab-case'];
+const allowedCaseOptions = ['camelCase', 'kebab-case', 'snake_case'];
 const regs = {
     "camelCase": /^[a-z][a-z0-9]*([A-Z][a-z0-9]*)*$/,
     "kebab-case": /^[a-z][a-z0-9]*(-[a-z0-9]*)*$/
@@ -9,8 +9,7 @@ module.exports = {
     meta: {
         type: 'suggestion',
         docs: {
-            description: 'Ensure Vue style names match with "KEBAB_CASE"',
-            category: 'Best Practices',
+            description: 'Ensure template class name matching caseTypes',
             recommended: true
         },
         fixable: 'code',
@@ -18,9 +17,14 @@ module.exports = {
             {
                 type: "object",
                 properties: {
-                    caseType: {
-                        type: "string",
-                        enum: allowedCaseOptions
+                    caseTypes: {
+                        type: "array",
+                        items: {
+                            type: "string",
+                            enum: allowedCaseOptions
+                        },
+                        uniqueItems: true,
+                        additionalItems: false
                     },
                     ignores: {
                         type: "array",
@@ -33,40 +37,115 @@ module.exports = {
                 },
                 additionalProperties: false
             }
-        ]
+        ],
+        messages: {
+            avoidClassName: "Identifier '{{ name }}' is not in ['{{ types }}'] case."
+        }
     },
     create(context){
         return utils.defineTemplateBodyVisitor(
             context,
             {
+                "VAttribute[directive=true] > VDirectiveKey[name.name='bind'][argument.name='class']"(node){
+                    const attributeNode = node.parent;
+                    if (!attributeNode.value || !attributeNode.value.expression) {
+                        return;
+                    }
+
+                    const expressionNode = attributeNode.value.expression;
+
+                    const classList = findStaticClasses(expressionNode);
+
+                    classListCheck(context, classList, node);
+
+                },
                 "VAttribute[directive=false][key.name='class']"(node){
                     const value = node.value;
                     if(!value) return;
-                    const { caseType, ignores } = context.options[0];
                     const classList = value.value.split(" ");
-                    classList.forEach(item=>{
 
-                        let isIgnore = false;
-                        
-                        if(ignores && ignores.length > 0){
-                            ignores.forEach(ignore=>{
-                                if(item.includes(ignore)){
-                                    isIgnore = true;
-                                }
-                            })
-                        }
+                    classListCheck(context, classList, node);
 
-                        const caseChecker = casing.getChecker(caseType || 'camelCase');
-                        if(!isIgnore && caseType && !caseChecker(item)){
-                            context.report({
-                                node,
-                                message: `Vue css class names '${item}' does not match patterns, you should name them such as ${caseType === 'kebab-case' ? 'box-header' : 'boxHeader'}.`
-                            })
-                        }
-                        
-                    })
                 }
             }    
         )
     }
+}
+/**
+ * @param {context} context
+ * @param {classList} classList
+ * @param {node} node
+ */
+function classListCheck(context, classList, node){
+
+    const { caseTypes, ignores } = context.options[0];
+
+    classList.forEach(item=>{
+
+        let isIgnore = false;
+        
+        if(ignores && ignores.length > 0){
+            ignores.forEach(ignore=>{
+                if(item.includes(ignore)){
+                    isIgnore = true;
+                }
+            })
+        }
+
+        let isCaseChecker = false;
+        if(caseTypes && caseTypes.length > 0){
+            caseTypes.forEach(caseType => {
+                const caseChecker = casing.getChecker(caseType);
+                if(caseChecker(item)){
+                    isCaseChecker = true;
+                }
+            })
+        }
+
+        if(ignores && !isIgnore && caseTypes && !isCaseChecker){
+            context.report({
+                node,
+                messageId: "avoidClassName",
+                data: {
+                    name: item,
+                    types: caseTypes.join(' , ')
+                }
+            })
+        }
+        
+    })
+}
+
+/**
+ * @param {ConditionalExpression} expressionNode
+ * @returns {(Literal)[]}
+ */
+function findStaticClasses(expressionNode) {
+    if (isStringLiteral(expressionNode)) {
+        return [expressionNode]
+    }
+    if(expressionNode.type === 'ConditionalExpression'){
+        let classList = [];
+        for (const key in expressionNode) {
+            if (Object.hasOwnProperty.call(expressionNode, key)) {
+                const element = expressionNode[key];
+                if(element.type === 'Literal'){
+                    classList.push(element.value);
+                }
+            }
+        }
+        return classList;
+    }
+    return [];
+}
+
+/**
+ * @param {ASTNode} node
+ * @returns {node is Literal | TemplateLiteral}
+ */
+function isStringLiteral(node) {
+    return (
+        (node.type === 'Literal' && typeof node.value === 'string') ||
+        (node.type === 'TemplateLiteral' && node.expressions.length === 0)
+    )
 }

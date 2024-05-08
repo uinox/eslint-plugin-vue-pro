@@ -1,10 +1,20 @@
 {
   "name": "eslint-plugin-vue-pro",
-  "version": "1.0.1",
-  "description": "",
+  "version": "1.0.2",
+  "description": "an extra ESLint plugin for Vue.js",
   "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/uinox/eslint-plugin-vue-pro"
+  },
+  "author": "uinox <326138915@qq.com> (https://kpa.cc)",
+  "bugs": {
+    "url": "https://github.com/uinox/eslint-plugin-vue-pro/issues"
+  },
+  "homepage": "https://github.com/uinox/eslint-plugin-vue-pro",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint ."
   },
   "peerDependencies": {
     "eslint": "^8.57.0",

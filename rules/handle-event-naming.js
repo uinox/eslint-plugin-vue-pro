@@ -6,8 +6,7 @@ module.exports = {
     meta: {
         type: 'suggestion',
         docs: {
-            description: 'Ensure Vue event handle method names start with "handle"',
-            category: 'Best Practices',
+            description: 'Ensure handle event method names matche rules',
             recommended: true
         },
         schema: [
@@ -40,16 +39,20 @@ module.exports = {
                 },
                 additionalProperties: false
             }
-        ]
+        ],
+        messages: {
+            avoidPrefixes: "Identifier '{{ name }}' should start with ['{{ prefixes }}'].",
+            avoidSuffixes: "Identifier '{{ name }}' should end with ['{{ suffixes }}'].",
+            avoidCaseType: "Identifier '{{ name }}' is not in '{{ caseType }}' case.",
+            avoidMaxLen: "Identifier '{{ name }}' length exceeds the maxLen '{{ maxLen }}'."
+        }
     },
     create(context){
-        // console.log("----resourceCode", context.sourceCode);
+
         return utils.defineTemplateBodyVisitor(
             context,
-            // Event handlers for <template>.
             {
                 VElement(node) {
-                    //...
                     if(node.startTag.attributes.length>0){
                         node.startTag.attributes.forEach(item=>{
                             if(item.key.name.rawName == "on" || item.key.name.rawName == "@"){
@@ -66,7 +69,11 @@ module.exports = {
                                     if(prefixes && !prefixesCheck){
                                         context.report({
                                             node,
-                                            message: `Vue event handle method '${item.value.expression.name}' should start with [${prefixes}].`
+                                            messageId: "avoidPrefixes",
+                                            data: {
+                                                name: item.value.expression.name,
+                                                prefixes
+                                            }
                                         });
                                     }
                                     let suffixesCheck = false;
@@ -80,7 +87,11 @@ module.exports = {
                                     if(suffixes && !suffixesCheck){
                                         context.report({
                                             node,
-                                            message: `Vue event handle method '${item.value.expression.name}' should end with [${suffixes}].`
+                                            messageId: "avoidSuffixes",
+                                            data: {
+                                                name: item.value.expression.name,
+                                                suffixes
+                                            }
                                         })
                                     }
 
@@ -88,13 +99,21 @@ module.exports = {
                                     if(caseType && !caseChecker(item.value.expression.name)){
                                         context.report({
                                             node,
-                                            message: `Vue event handle method '${item.value.expression.name}' does not match the '${caseType}' pattern`
+                                            messageId: "avoidCaseType",
+                                            data: {
+                                                name: item.value.expression.name,
+                                                caseType
+                                            }
                                         })
                                     }
                                     if(maxLen && item.value.expression.name.length > maxLen){
                                         context.report({
                                             node,
-                                            message: `Vue event handle method '${item.value.expression.name}' length exceeds the maxLen ${maxLen}`
+                                            messageId: "avoidMaxLen",
+                                            data: {
+                                                name: item.value.expression.name,
+                                                maxLen
+                                            }
                                         })
                                     }
                                 }
@@ -106,11 +125,8 @@ module.exports = {
         )
     
         /* return {
-            // "ObjectExpression > Property[key.name='methods'] > ObjectExpression > Property[key.name=/^on.+/][value.type='FunctionExpression']"(node){
             "ObjectExpression > Property[key.name='methods'] > ObjectExpression > Property[key.name][value.type='FunctionExpression']"(node){
-                console.log("---node",node.key.name);
                 const methodName = node.key.name;
-                console.log("--methodName--",methodName);
                 if(!methodName.startsWith('handle')){
                     context.report({
                         node,

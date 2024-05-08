@@ -5,7 +5,7 @@
 You'll first need to install [ESLint](https://eslint.org) [eslint-plugin-vue](https://eslint.vuejs.org):
 
 ```sh
-npm i eslint@8 eslint-plugin-vue --save-dev
+npm i eslint@8 eslint-plugin-vue vue-eslint-parser --save-dev
 ```
 
 Next, install
@@ -23,7 +23,8 @@ Add `vue-pro` to the plugins section of your `.eslintrc` configuration file. You
 
 ```json
 {
-    "plugins": ["vue-pro"]
+    "parser": "vue-eslint-parser",
+    "plugins": ["vue-pro"],
 }
 ```
 
@@ -36,7 +37,7 @@ Then configure the rules you want to use under the rules section.
             "error",
             {
                 "prefixes": ["handle", "on"],
-                "suffixes": ["Submit"],
+                // "suffixes": ["Submit"],
                 "caseType": "camelCase", //['kebab-case', 'camelCase']
                 "maxLen": 20
             }
@@ -44,14 +45,14 @@ Then configure the rules you want to use under the rules section.
         "vue-pro/css-naming": [
             "error",
             {
-                "caseType": "kebab-case", // ['camelCase', 'kebab-case']
-                "ignores": ["el-"], //
+                "caseTypes": ["kebab-case", "snake_case"], // ['camelCase', 'kebab-case', 'snake_case']
+                "ignores": ["el-"]
             }
         ],
         "vue-pro/constant-naming": [
             "error",
             {
-                "pattern": /^[A-Z][A-Z_]*[A-Z]$/, // CONFIG_IMGURL
+                "pattern": /^[A-Z][A-Z_]*[A-Z]$/, // eg: CONFIG_IMGURL
             }
         ],
     }
