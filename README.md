@@ -55,6 +55,14 @@ Then configure the rules you want to use under the rules section.
                 "pattern": /^[A-Z][A-Z_]*[A-Z]$/, // eg: CONFIG_IMGURL
             }
         ],
+        "vue-pro/check-file": [
+            "error",
+            {
+                "caseTypes": ["PASCAL_CASE"], //['camelCase', 'snake_case', 'PASCAL_CASE']
+                "fileTypes": ["vue"],
+                "ignores": ["index"]
+            }
+        ]
     }
 }
 ```
