@@ -58,7 +58,7 @@ Then configure the rules you want to use under the rules section.
         "vue-pro/check-file": [
             "error",
             {
-                "caseTypes": ["PASCAL_CASE"], //['camelCase', 'snake_case', 'PASCAL_CASE']
+                "caseTypes": ["PascalCase"], //['camelCase', 'snake_case', 'PascalCase']
                 "fileTypes": [".vue"],
                 "ignores": ["index"]
             }

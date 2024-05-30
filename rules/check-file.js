@@ -1,5 +1,5 @@
 const casing = require("../utils/casing");
-const allowedCaseOptions = ['camelCase', 'snake_case', 'PASCAL_CASE'];
+const allowedCaseOptions = ['camelCase', 'snake_case', 'PascalCase'];
 
 module.exports = {
     meta: {
