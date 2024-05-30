@@ -49,7 +49,7 @@ module.exports = {
     create(context){
         return {
             Program(node){
-                const { fileTypes } = context.options[0];
+                const { caseTypes, fileTypes, ignores } = context.options[0];
                 const fileName = context.getFilename().match(/\w+.\w+$/)[0];
                 const componentName = fileName.match(/\w+/)[0];
 
@@ -57,7 +57,7 @@ module.exports = {
                 let isFileTypes = false;
                 if(fileTypes && fileTypes.length > 0){
                     fileTypes.forEach(fileType=>{
-                        if(fileName.name.endsWith(fileType)){
+                        if(fileName.endsWith(fileType)){
                             isFileTypes = true;
                         }
                     })
@@ -96,7 +96,7 @@ module.exports = {
                             node,
                             messageId: "avoidFileName",
                             data: {
-                                name: componentName,
+                                name: fileName,
                                 types: caseTypes.join(', ')
                             }
                         })

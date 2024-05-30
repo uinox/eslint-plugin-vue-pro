@@ -59,7 +59,7 @@ Then configure the rules you want to use under the rules section.
             "error",
             {
                 "caseTypes": ["PASCAL_CASE"], //['camelCase', 'snake_case', 'PASCAL_CASE']
-                "fileTypes": ["vue"],
+                "fileTypes": [".vue"],
                 "ignores": ["index"]
             }
         ]
