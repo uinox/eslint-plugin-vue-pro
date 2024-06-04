@@ -74,9 +74,9 @@ module.exports = {
                 }
                 
                 // whether it needs to be checked
-                let needCheck = false;
-                if(!isIgnore || isFileTypes){
-                    needCheck = true;
+                let needCheck = true;
+                if(isIgnore || !isFileTypes){
+                    needCheck = false;
                 }
 
                 if(needCheck){

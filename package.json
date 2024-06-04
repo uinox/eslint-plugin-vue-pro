@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-vue-pro",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "license": "MIT",
   "description": "an extra ESLint plugin for Vue.js",
   "main": "index.js",
